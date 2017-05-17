@@ -22,9 +22,11 @@ module.exports = {
         test: /\.(jpg|png)$/,
         loader: 'url-loader',
         options: {
-          limit: 25000
+          limit: 25000,
+          name:"[hash]-[name].[ext]"
         }
       }
     ]
-  }
+  },
+  devtool: 'source-map'
 };

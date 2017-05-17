@@ -14,11 +14,23 @@ class App extends Component {
     this.setState({ gameStarted: true });
   }
 
+  setEndGame = (ifEnd) => {
+    if (ifEnd){
+      this.setState({gameOver: true});
+    } else {
+      this.setState({gameOver: false});
+    }
+  }
+
+  returnToMain = () => {
+    this.setState({gameStarted: false});
+
+  }
+
   render() {
     let { gameStarted, username } = this.state;
-
     if(gameStarted)
-      return(<Game {...this.state} />);
+      return( <Game {...this.state} setUsername={this.setUsername} setEndGame={this.setEndGame} returnToMain={this.returnToMain}/>);
     else
       return(<PlayerForm username={username} setUsername={this.setUsername} startGame={this.startGame} />);
   }

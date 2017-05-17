@@ -1,19 +1,29 @@
 import React from 'react';
 
-const Card = ({ updateCard, flipped, matched, icon, index }) => (
-  <div 
-    className='col-xs-3 text-center' 
-    style={{ height: '300px', border: '1px solid black'}}
-  >
-   {/*need a onClick handler on the card div to call updateCard*/}
-   
-   {/*show icon if flipped or matched*/}
-   {/*<i className={`fa ${icon} fa-5x`} />*/}
+const Card = ({ updateCard, flipped, matched, icon, index }) => {
 
-   {/*do not show icon if not flipped or matched*/}
+  let clickCard =() => {
+    if(flipped === false && matched === false){
+      updateCard(index, true);
+    }
+  }
 
-   {/*do not allow user to click on card again if flipped or matched*/}
-  </div>
-);
+  return(
+    <div
+      className='col-xs-3 text-center'
+      style={{ height: '300px', border: '1px solid black'}}
+      onClick={() => setTimeout(clickCard,800)}
+    >
+      {flipped? <h1>{icon}</h1> : <div></div>}
+
+     {/*{flipped? <i className={`fa ${icon} fa-5x`} /> : <div></div>}*/}
+     {/*{flipped? <img src={k1} /> : <div></div>} */}
+     {/*show icon if flipped or matched*/}
+     {/*do not show icon if not flipped or matched*/}
+
+
+    </div>
+  )
+};
 
 export default Card;
