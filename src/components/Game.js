@@ -14,10 +14,23 @@ class Game extends Component {
     { flipped: false, matched: false, icon: 'fa-cloud-upload'},
     { flipped: false, matched: false, icon: 'fa-cloud-download'}
   ]
+
+  gameStartTime = Date.now();
+
   //use flippedCardIndexes to check how many cards are flipped
   //use matchedCardIndexes to check if count === 8 || this.state.cards.length, then game over
-  state = { cards: this.cards, flippedCardIndexes: [], matchedCardIndexes: []};
+  state = { cards: this.cards, flippedCardIndexes: [], matchedCardIndexes: [], timeSpend:null, fastestTime:9999};
 
+
+  //
+  // countTime = () => {
+  //   let counter = 0;
+  //   let {gameOver, gameStarted} = this.props;
+  //   while(gameOver === false && gameStarted === true) {
+  //     setTimeout(()=>{counter++} , 1000);
+  //     console.log(counter);
+  //   }
+  // }
 
   checkMatch = () => {
     let flippedCardIndexes = this.state.flippedCardIndexes;
@@ -34,7 +47,6 @@ class Game extends Component {
       } else {
         cards[currFlipIndex].flipped = false;
         cards[prevFlipIndex].flipped = false;
-        console.log(cards,flippedCardIndexes);
         flippedCardIndexes = flippedCardIndexes.slice(2);
         this.setState({flippedCardIndexes});
       }
@@ -46,8 +58,16 @@ class Game extends Component {
 
   checkGameOver = () => {
     let matchCount = this.state.matchedCardIndexes.length;
-    if (matchCount === 8)
+    let {fastestTime} = this.state;
+    if (matchCount === 8){
       this.props.setEndGame(true);
+      let timeSpent = ((Date.now() - this.gameStartTime)/1000).toFixed(2);
+      this.setState({timeSpent});
+      if(fastestTime >= timeSpent) {
+        this.setState({fastestTime:timeSpent});
+      }
+    }
+
   }
 
   // What lifecycle method could we use each time the components state is updated to check for gameOver
@@ -61,6 +81,7 @@ class Game extends Component {
   // implement a game timer and save fastest times
   // integrate this project into an express app and store this info to a database
   //randomize cards on new game (hint - lookup javascript shuffle array)
+
 
 
   updateCard = (cardIndex, flipped = false, matched = false) => {
@@ -77,13 +98,16 @@ class Game extends Component {
   }
 
   newGame = () => {
-    this.setState({cards: this.cards, flippedCardIndexes: [], matchedCardIndexes: []});
+    this.setState({cards: this.cards, flippedCardIndexes: [], matchedCardIndexes: [], timeSpent:null });
     this.props.setEndGame(false);
     this.shuffleCards();
+    this.gameStartTime = Date.now();
+
   }
 
   endAll = () => {
     this.newGame();
+    this.setState({fastestTime:9999});
     this.props.returnToMain();
   }
 
@@ -104,12 +128,14 @@ class Game extends Component {
 
   render(){
     let { username, gameStarted, gameOver, setUsername} = this.props;
-
+    let {fastestTime, timeSpent} = this.state;
     return(
       <div className='container'>
         <h1 className='text-center'>React Memory Match</h1>
         <h4>Current Player: </h4>
         <input value={username} id="username" onChange={setUsername}/>
+        <h4>Current Game Time: {timeSpent}</h4>
+        {fastestTime !== 9999 ? <h4>Fastest Time: {this.state.fastestTime}</h4> : <div></div>}
         <button onClick={this.endAll}>Home Page</button>
         {gameOver ? <button onClick={this.newGame}>New Game</button> : <div></div>}
         <Board cards={ this.state.cards } updateCard={ this.updateCard }  />
