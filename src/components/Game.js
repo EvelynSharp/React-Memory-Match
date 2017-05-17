@@ -79,11 +79,27 @@ class Game extends Component {
   newGame = () => {
     this.setState({cards: this.cards, flippedCardIndexes: [], matchedCardIndexes: []});
     this.props.setEndGame(false);
+    this.shuffleCards();
   }
 
   endAll = () => {
     this.newGame();
     this.props.returnToMain();
+  }
+
+  shuffleCards = () => {
+    let cardLength = this.cards.length;
+    let cards = this.cards;
+    let randomIndex;
+    let tempValue;
+    while(0 !== cardLength){
+      randomIndex = Math.floor(Math.random()*cardLength);
+      cardLength--;
+      tempValue= cards[cardLength];
+      cards[cardLength] = cards[randomIndex];
+      cards[randomIndex] = tempValue;
+    }
+    this.cards = [...cards];
   }
 
   render(){
