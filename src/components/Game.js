@@ -1,25 +1,36 @@
 import React, { Component } from 'react';
 import Board from './Board';
+import K1 from '../images/k1.png';
+import K4 from '../images/k4.png';
+import K7 from '../images/k7.png';
+import K6 from '../images/k6.png';
+
 
 class Game extends Component {
   // Match Icons: fa-bug, fa-bolt, fa-cloud-upload, fa-cloud-download
 
   cards = [
-    { flipped: false, matched: false, icon: 'fa-bug'},
-    { flipped: false, matched: false, icon: 'fa-bolt'},
-    { flipped: false, matched: false, icon: 'fa-bug'},
-    { flipped: false, matched: false, icon: 'fa-bolt'},
-    { flipped: false, matched: false, icon: 'fa-cloud-upload'},
-    { flipped: false, matched: false, icon: 'fa-cloud-download'},
-    { flipped: false, matched: false, icon: 'fa-cloud-upload'},
-    { flipped: false, matched: false, icon: 'fa-cloud-download'}
+    { flipped: false, matched: false, icon: K1},
+    { flipped: false, matched: false, icon: K4},
+    { flipped: false, matched: false, icon: K1},
+    { flipped: false, matched: false, icon: K4},
+    { flipped: false, matched: false, icon: K7},
+    { flipped: false, matched: false, icon: K6},
+    { flipped: false, matched: false, icon: K7},
+    { flipped: false, matched: false, icon: K6}
   ]
 
   gameStartTime = Date.now();
 
   //use flippedCardIndexes to check how many cards are flipped
   //use matchedCardIndexes to check if count === 8 || this.state.cards.length, then game over
-  state = { cards: this.cards, flippedCardIndexes: [], matchedCardIndexes: [], timeSpend:null, fastestTime:9999};
+  state = { cards: this.cards,
+            flippedCardIndexes: [],
+            matchedCardIndexes: [],
+            timeSpend:null,
+            fastestTime:9999,
+            allowClick: true
+          };
 
 
   //
@@ -50,8 +61,11 @@ class Game extends Component {
         flippedCardIndexes = flippedCardIndexes.slice(2);
         this.setState({flippedCardIndexes});
       }
-      this.setState({cards});
-      setTimeout(this.checkGameOver,500);
+      this.setState({cards},()=>{
+        this.setState({allowClick: true})
+        this.checkGameOver();
+      });
+
     }
   }
 
@@ -84,7 +98,10 @@ class Game extends Component {
 
 
 
+
   updateCard = (cardIndex, flipped = false, matched = false) => {
+    //make people unable to click until this is completely done running
+    //pass state in app.js share between game and card that prevents card click accessing updatecard function
     let cards = this.state.cards.map( (card, loopIndex) => {
       if(cardIndex === loopIndex)
         return { ...card, flipped, matched };
@@ -92,9 +109,14 @@ class Game extends Component {
         return card;
     })
     let newFlippedIndex = [...this.state.flippedCardIndexes,cardIndex];
+    if (newFlippedIndex.length%2 === 0 && newFlippedIndex.length !== 0){
+      this.setState({allowClick: false});
+    }
     this.setState({ cards:cards });
-    this.setState({flippedCardIndexes:newFlippedIndex});
-    setTimeout(this.checkMatch,800);
+    this.setState({flippedCardIndexes:newFlippedIndex}, () => {
+      setTimeout(this.checkMatch,800);
+    });
+
   }
 
   newGame = () => {
@@ -128,17 +150,20 @@ class Game extends Component {
 
   render(){
     let { username, gameStarted, gameOver, setUsername} = this.props;
-    let {fastestTime, timeSpent} = this.state;
+    let {fastestTime, timeSpent, allowClick} = this.state;
     return(
       <div className='container'>
         <h1 className='text-center'>React Memory Match</h1>
         <h4>Current Player: </h4>
         <input value={username} id="username" onChange={setUsername}/>
+
         <h4>Current Game Time: {timeSpent}</h4>
-        {fastestTime !== 9999 ? <h4>Fastest Time: {this.state.fastestTime}</h4> : <div></div>}
-        <button onClick={this.endAll}>Home Page</button>
-        {gameOver ? <button onClick={this.newGame}>New Game</button> : <div></div>}
-        <Board cards={ this.state.cards } updateCard={ this.updateCard }  />
+        {fastestTime !== 9999 && <h4>Fastest Time: {this.state.fastestTime}</h4> }
+
+        <button className="btn-primary" style={{margin:'30px'}} onClick={this.endAll}>Home Page</button>
+        {gameOver && <button className="btn-primary"  onClick={this.newGame}>New Game</button>}
+
+        <Board cards={ this.state.cards } updateCard={ this.updateCard } allowClick={allowClick} />
       </div>
     );
   }

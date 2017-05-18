@@ -14,6 +14,7 @@ class App extends Component {
     this.setState({ gameStarted: true });
   }
 
+
   setEndGame = (ifEnd) => {
     if (ifEnd){
       this.setState({gameOver: true});
