@@ -45,7 +45,7 @@ class Game extends Component {
 
   checkMatch = () => {
     let flippedCardIndexes = this.state.flippedCardIndexes;
-    if (flippedCardIndexes.length%2 === 0 && flippedCardIndexes.length !== 0) {
+
       let currFlipIndex = flippedCardIndexes[flippedCardIndexes.length-1];
       let prevFlipIndex = flippedCardIndexes[flippedCardIndexes.length-2];
       let {cards} = this.state;
@@ -63,10 +63,10 @@ class Game extends Component {
       }
       this.setState({cards},()=>{
         this.setState({allowClick: true})
-        this.checkGameOver();
+        setTimeout(this.checkGameOver(),100);
       });
 
-    }
+
   }
 
 
@@ -114,7 +114,9 @@ class Game extends Component {
     }
     this.setState({ cards:cards });
     this.setState({flippedCardIndexes:newFlippedIndex}, () => {
-      setTimeout(this.checkMatch,800);
+      if (newFlippedIndex.length%2 === 0 && newFlippedIndex.length !== 0) {
+        setTimeout(this.checkMatch,800);
+      }
     });
 
   }
